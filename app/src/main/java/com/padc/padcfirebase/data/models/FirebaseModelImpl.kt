@@ -9,8 +9,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.padc.padcfirebase.data.vos.ArticleVO
+import com.padc.padcfirebase.utils.REF_KEY_CLAP_COUNT
 import com.padc.padcfirebase.utils.REF_PATH_ARTICLES
-import java.util.*
 import kotlin.collections.ArrayList
 
 object FirebaseModelImpl: FirebaseModel {
@@ -70,8 +70,55 @@ object FirebaseModelImpl: FirebaseModel {
 
     override fun getArticleById(id: String, cleared: LiveData<Unit>): LiveData<ArticleVO> {
         val liveData = MutableLiveData<ArticleVO>()
-        // todo get real time data for single article
+
+        val articleRef = databaseRef.child(REF_PATH_ARTICLES).child(id)
+
+        // Read from the database
+        val realTimeListener = object : ValueEventListener {
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                Log.d(TAG, "Key is: ${dataSnapshot.key}")
+
+                val article: ArticleVO? = dataSnapshot.getValue(ArticleVO::class.java)?.also {
+                    liveData.value = it
+                }
+
+                Log.d(TAG, "Value is: $article")
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Failed to read value
+                Log.w(TAG, "Failed to read value.", error.toException())
+            }
+        }
+
+        // Start real-time data observing
+        articleRef.addValueEventListener(realTimeListener)
+
+        // Stop real-time data observing when Presenter's onCleared() was called
+        cleared.observeForever(object : Observer<Unit>{
+            override fun onChanged(unit: Unit?) {
+                unit?.let {
+                    articleRef.removeEventListener(realTimeListener)
+                    cleared.removeObserver(this)
+                }
+            }
+        })
 
         return liveData
+    }
+
+    override fun updateClapCount(count: Int, article: ArticleVO) {
+        val articleRef = databaseRef.child(REF_PATH_ARTICLES).child(article.id)
+        articleRef.child(REF_KEY_CLAP_COUNT).setValue(count + article.claps)
+            .addOnSuccessListener {
+                Log.d(TAG, "Clap Count ++")
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Clap Count ++ error ${it.localizedMessage}")
+            }
     }
 }

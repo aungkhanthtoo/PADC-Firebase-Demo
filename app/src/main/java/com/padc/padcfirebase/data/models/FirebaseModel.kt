@@ -9,4 +9,6 @@ interface FirebaseModel {
     fun getAllArticles(cleared: LiveData<Unit>): LiveData<List<ArticleVO>>
 
     fun getArticleById(id: String, cleared: LiveData<Unit>): LiveData<ArticleVO>
+
+    fun updateClapCount(count: Int, article: ArticleVO)
 }

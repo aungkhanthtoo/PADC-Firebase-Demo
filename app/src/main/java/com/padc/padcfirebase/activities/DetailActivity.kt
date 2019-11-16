@@ -3,6 +3,7 @@ package com.padc.padcfirebase.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
@@ -11,6 +12,7 @@ import com.padc.padcfirebase.R
 import com.padc.padcfirebase.data.vos.ArticleVO
 import com.padc.padcfirebase.mvp.presenters.ArticleDetailPresenter
 import com.padc.padcfirebase.mvp.views.ArticleDetailView
+import com.wajahatkarim3.clapfab.ClapFAB
 import kotlinx.android.synthetic.main.activity_detail.*
 import kotlinx.android.synthetic.main.content_detail.*
 
@@ -23,6 +25,7 @@ class DetailActivity : AppCompatActivity(), ArticleDetailView {
         setContentView(R.layout.activity_detail)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setupPresenter()
+        setupListener()
 
         val id = intent.getStringExtra(EXTRA_ID)!!
         presenter.onUIReady(this,id)
@@ -64,5 +67,13 @@ class DetailActivity : AppCompatActivity(), ArticleDetailView {
     private fun setupPresenter() {
         presenter = ViewModelProviders.of(this).get(ArticleDetailPresenter::class.java)
         presenter.initPresenter(this)
+    }
+
+    private fun setupListener() {
+        fab.clapListener = object : ClapFAB.OnClapListener {
+            override fun onFabClapped(clapFab: ClapFAB, count: Int, isMaxReached: Boolean) {
+                presenter.onClapped(count)
+            }
+        }
     }
 }
