@@ -1,12 +1,14 @@
 package com.padc.padcfirebase.activities
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.ViewModelProviders
 import com.padc.padcfirebase.R
 import com.padc.padcfirebase.adapters.ArticlesAdapter
+import com.padc.padcfirebase.data.vos.ArticleVO
 import com.padc.padcfirebase.mvp.presenters.ArticlesPresenter
 import com.padc.padcfirebase.mvp.views.ArticlesView
 
@@ -44,6 +46,11 @@ class MainActivity : AppCompatActivity(), ArticlesView {
 
     override fun navigateToDetail(id: String) {
         startActivity(DetailActivity.newIntent(this))
+    }
+
+    override fun showArticles(data: List<ArticleVO>) {
+        Log.d("Firebase", data.toString())
+        adapter.setNewData(data.toMutableList())
     }
 
     private fun setupRecyclerView(){

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="4dp"
     android:clickable="true"
     app:cardElevation="6dp"
     android:foreground="?attr/selectableItemBackground"
@@ -31,7 +32,7 @@
             android:lineSpacingMultiplier="1.5"
             android:maxLines="2"
             android:textColor="@android:color/black"
-            android:padding="4dp"
+            android:padding="8dp"
             android:text="လူသားများ အချိန်မရွေး မျိုးတုန်းသွားဖို့ဆိုတာဟာ ဖြစ်နိုင်ခြေရှိပါတယ်"
             android:textSize="16sp" />
 
