@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.padc.padcfirebase.data.models.FirebaseModel
 import com.padc.padcfirebase.data.models.FirebaseModelImpl
+import com.padc.padcfirebase.data.vos.ArticleVO
 import com.padc.padcfirebase.delegates.ArticleItemDelegate
 import com.padc.padcfirebase.mvp.views.ArticlesView
 import java.util.*
@@ -20,8 +21,8 @@ class ArticlesPresenter: BasePresenter<ArticlesView>(), ArticleItemDelegate {
         })
     }
 
-    override fun onArticleItemClicked(data: Any) {
-        mView.navigateToDetail("")
+    override fun onArticleItemClicked(data: ArticleVO) {
+        mView.navigateToDetail(data.id)
     }
 
     override fun onCleared() {

@@ -17,7 +17,6 @@ class ArticleViewHolder(itemView: View, delegate: ArticleItemDelegate): BaseView
     init {
         itemView.setOnClickListener {
             data?.let { delegate.onArticleItemClicked(it) }
-                ?: delegate.onArticleItemClicked(Any())
         }
     }
 

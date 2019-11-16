@@ -1,6 +1,8 @@
 package com.padc.padcfirebase.delegates
 
+import com.padc.padcfirebase.data.vos.ArticleVO
+
 interface ArticleItemDelegate {
 
-    fun onArticleItemClicked(data: Any)
+    fun onArticleItemClicked(data: ArticleVO)
 }

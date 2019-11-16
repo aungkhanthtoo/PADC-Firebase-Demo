@@ -19,8 +19,6 @@ class MainActivity : AppCompatActivity(), ArticlesView {
     private lateinit var adapter: ArticlesAdapter
     private lateinit var presenter: ArticlesPresenter
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -47,7 +45,7 @@ class MainActivity : AppCompatActivity(), ArticlesView {
     }
 
     override fun navigateToDetail(id: String) {
-        startActivity(DetailActivity.newIntent(this))
+        startActivity(DetailActivity.newIntent(this, id))
     }
 
     override fun showArticles(data: List<ArticleVO>) {

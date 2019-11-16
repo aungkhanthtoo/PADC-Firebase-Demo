@@ -8,5 +8,5 @@ interface FirebaseModel {
 
     fun getAllArticles(cleared: LiveData<Unit>): LiveData<List<ArticleVO>>
 
-    fun getArticleById(id: String): LiveData<ArticleVO>
+    fun getArticleById(id: String, cleared: LiveData<Unit>): LiveData<ArticleVO>
 }

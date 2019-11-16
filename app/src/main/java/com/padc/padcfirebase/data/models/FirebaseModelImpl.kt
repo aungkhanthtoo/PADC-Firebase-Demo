@@ -68,7 +68,10 @@ object FirebaseModelImpl: FirebaseModel {
         return liveData
     }
 
-    override fun getArticleById(id: String): LiveData<ArticleVO> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getArticleById(id: String, cleared: LiveData<Unit>): LiveData<ArticleVO> {
+        val liveData = MutableLiveData<ArticleVO>()
+        // todo get real time data for single article
+
+        return liveData
     }
 }
