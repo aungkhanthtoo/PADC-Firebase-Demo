@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.ViewModelProviders
+import com.google.firebase.database.FirebaseDatabase
 import com.padc.padcfirebase.R
 import com.padc.padcfirebase.adapters.ArticlesAdapter
 import com.padc.padcfirebase.data.vos.ArticleVO
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity(), ArticlesView {
     private lateinit var presenter: ArticlesPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupPresenter()
