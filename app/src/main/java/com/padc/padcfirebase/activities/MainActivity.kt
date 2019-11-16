@@ -19,6 +19,8 @@ class MainActivity : AppCompatActivity(), ArticlesView {
     private lateinit var adapter: ArticlesAdapter
     private lateinit var presenter: ArticlesPresenter
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

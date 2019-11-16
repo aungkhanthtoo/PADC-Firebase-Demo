@@ -3,12 +3,15 @@ package com.padc.padcfirebase.data.models
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.padc.padcfirebase.data.vos.ArticleVO
 import com.padc.padcfirebase.utils.REF_PATH_ARTICLES
+import java.util.*
+import kotlin.collections.ArrayList
 
 object FirebaseModelImpl: FirebaseModel {
 
@@ -16,12 +19,13 @@ object FirebaseModelImpl: FirebaseModel {
 
     private val databaseRef = FirebaseDatabase.getInstance().reference
 
-    override fun getAllArticles(): LiveData<List<ArticleVO>> {
+    override fun getAllArticles(cleared: LiveData<Unit>): LiveData<List<ArticleVO>> {
         val liveData = MutableLiveData<List<ArticleVO>>()
 
         val articlesRef = databaseRef.child(REF_PATH_ARTICLES)
+
         // Read from the database
-        articlesRef.addValueEventListener(object : ValueEventListener {
+        val realTimeListener = object : ValueEventListener {
 
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 // This method is called once with the initial value and again
@@ -45,6 +49,19 @@ object FirebaseModelImpl: FirebaseModel {
             override fun onCancelled(error: DatabaseError) {
                 // Failed to read value
                 Log.w(TAG, "Failed to read value.", error.toException())
+            }
+        }
+
+        // Start real-time data observing
+        articlesRef.addValueEventListener(realTimeListener)
+
+        // Stop real-time data observing when Presenter's onCleared() was called
+        cleared.observeForever(object : Observer<Unit>{
+            override fun onChanged(unit: Unit?) {
+                unit?.let {
+                    articlesRef.removeEventListener(realTimeListener)
+                    cleared.removeObserver(this)
+                }
             }
         })
 
