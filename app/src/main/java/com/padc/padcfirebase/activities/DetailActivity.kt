@@ -85,7 +85,7 @@ class DetailActivity : AppCompatActivity(), ArticleDetailView {
         tvDate.text = data.date
         tvBody.text = data.body
 
-
+        commentsAdapter.setNewData(data.comments.values.sortedBy { it.id }.toMutableList())
 
         etComment.text = null
         etComment.clearFocus()

@@ -126,6 +126,24 @@ object FirebaseModelImpl: FirebaseModel {
     }
 
     override fun addComment(comment: String, article: ArticleVO) {
-        
+        val commentsRef = databaseRef.child(REF_PATH_ARTICLES).child(article.id).child(REF_KEY_COMMENTS)
+
+        val currentUser = UserAuthenticationModelImpl.currentUser!!
+
+        val key = System.currentTimeMillis().toString()
+        val value = CommentVO(
+            key, "", comment, UserVO(
+                currentUser.providerId,
+                currentUser.displayName ?: "",
+                currentUser.photoUrl.toString())
+        )
+
+        commentsRef.child(key).setValue(value)
+            .addOnSuccessListener {
+                Log.d(TAG, "Add Comment")
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Add Comment error ${it.localizedMessage}")
+            }
     }
 }
