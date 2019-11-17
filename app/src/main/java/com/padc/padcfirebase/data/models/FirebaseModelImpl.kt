@@ -9,7 +9,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.padc.padcfirebase.data.vos.ArticleVO
+import com.padc.padcfirebase.data.vos.CommentVO
+import com.padc.padcfirebase.data.vos.UserVO
 import com.padc.padcfirebase.utils.REF_KEY_CLAP_COUNT
+import com.padc.padcfirebase.utils.REF_KEY_COMMENTS
 import com.padc.padcfirebase.utils.REF_PATH_ARTICLES
 import kotlin.collections.ArrayList
 
@@ -120,5 +123,9 @@ object FirebaseModelImpl: FirebaseModel {
             .addOnFailureListener {
                 Log.e(TAG, "Clap Count ++ error ${it.localizedMessage}")
             }
+    }
+
+    override fun addComment(comment: String, article: ArticleVO) {
+        
     }
 }

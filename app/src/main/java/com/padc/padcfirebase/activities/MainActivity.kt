@@ -1,11 +1,15 @@
 package com.padc.padcfirebase.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import androidx.lifecycle.ViewModelProviders
+import com.bumptech.glide.Glide
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
 import com.padc.padcfirebase.R
 import com.padc.padcfirebase.adapters.ArticlesAdapter
@@ -21,29 +25,41 @@ class MainActivity : AppCompatActivity(), ArticlesView {
     private lateinit var presenter: ArticlesPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupPresenter()
         setSupportActionBar(toolbar)
         setupRecyclerView()
+        setupListeners()
         presenter.onUIReady(this)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
+    override fun onStart() {
+        super.onStart()
+        presenter.onStart()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
+    override fun showLoginUser(user: FirebaseUser) {
+            Glide.with(this)
+                .load(user.photoUrl)
+                .into(ivCurrentUser)
+    }
+
+    override fun navigateToGoogleSignInScreen(signInIntent: Intent, rcGoogleSign: Int) {
+        startActivityForResult(signInIntent, rcGoogleSign)
+    }
+
+    override fun showGoogleLoginError(message: String) {
+        Snackbar.make(container, message, Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun showGoogleLoginSuccess(user: FirebaseUser) {
+        showLoginUser(user)
+    }
+
+    override fun showLogoutUser() {
+        ivCurrentUser.setImageResource(R.drawable.ic_account_circle_black_24dp)
     }
 
     override fun navigateToDetail(id: String) {
@@ -55,6 +71,11 @@ class MainActivity : AppCompatActivity(), ArticlesView {
         adapter.setNewData(data.toMutableList())
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        presenter.onActivityResult(requestCode, resultCode, data, this)
+    }
+
     private fun setupRecyclerView(){
         recyclerArticles.setHasFixedSize(true)
         adapter = ArticlesAdapter(presenter)
@@ -64,6 +85,12 @@ class MainActivity : AppCompatActivity(), ArticlesView {
     private fun setupPresenter(){
         presenter = ViewModelProviders.of(this).get(ArticlesPresenter::class.java).apply {
             initPresenter(this@MainActivity)
+        }
+    }
+
+    private fun setupListeners() {
+        ivCurrentUser.setOnClickListener {
+            presenter.onUserProfileClicked(this)
         }
     }
 }
