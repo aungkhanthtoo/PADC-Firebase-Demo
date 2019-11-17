@@ -1,5 +1,6 @@
 package com.padc.padcfirebase.data.models
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import com.padc.padcfirebase.data.vos.ArticleVO
 
@@ -11,5 +12,5 @@ interface FirebaseModel {
 
     fun updateClapCount(count: Int, article: ArticleVO)
 
-    fun addComment(comment: String, article: ArticleVO)
+    fun addComment(comment: String, pickedImage: Uri?, article: ArticleVO)
 }

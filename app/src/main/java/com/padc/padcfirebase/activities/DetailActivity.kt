@@ -2,6 +2,8 @@ package com.padc.padcfirebase.activities
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.nfc.NfcAdapter.EXTRA_ID
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -45,7 +47,21 @@ class DetailActivity : AppCompatActivity(), ArticleDetailView {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        presenter.onActivityResult(requestCode, resultCode, data, this)
+        if (requestCode != RC_PICK_IMAGE) {
+            presenter.onActivityResult(requestCode, resultCode, data, this)
+        }else {
+
+            if (resultCode == RESULT_OK && data != null && data.data != null) {
+                val uri = data.data
+
+                presenter.onImagePicked(uri!!)
+            }
+        }
+
+    }
+
+    override fun showPickedImage(uri: Uri) {
+        ivImagePick.setImageURI(uri)
     }
 
     override fun showCommentInputView() {
@@ -89,19 +105,12 @@ class DetailActivity : AppCompatActivity(), ArticleDetailView {
 
         etComment.text = null
         etComment.clearFocus()
+        ivImagePick.setImageResource(R.drawable.ic_image_black_24dp)
 
         ScreenUtils.hideSoftKeyboard(this, etComment)
     }
 
-    companion object {
 
-        private const val EXTRA_ID = "article_id"
-
-        fun newIntent(context: Context, id: String): Intent =
-            Intent(context, DetailActivity::class.java).apply {
-                putExtra(EXTRA_ID, id)
-            }
-    }
 
     private fun setupPresenter() {
         presenter = ViewModelProviders.of(this).get(ArticleDetailPresenter::class.java)
@@ -122,6 +131,20 @@ class DetailActivity : AppCompatActivity(), ArticleDetailView {
         ivSend.setOnClickListener {
             presenter.onCommentSendClicked(etComment.text.toString())
         }
+
+        ivImagePick.setOnClickListener {
+            val intent = Intent()
+            // Show only images, no videos or anything else
+            intent.type = "image/*"
+            intent.action = Intent.ACTION_GET_CONTENT
+            // Always show the chooser (if there are multiple options available)
+            startActivityForResult(
+                Intent.createChooser(intent, "Select Picture"),
+                RC_PICK_IMAGE
+            )
+
+        }
+
     }
 
     private fun setupRecyclerView() {
@@ -130,5 +153,15 @@ class DetailActivity : AppCompatActivity(), ArticleDetailView {
         rvComments.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL))
     }
 
+    companion object {
+
+        private const val EXTRA_ID = "article_id"
+        private const val RC_PICK_IMAGE = 100
+
+        fun newIntent(context: Context, id: String): Intent =
+            Intent(context, DetailActivity::class.java).apply {
+                putExtra(EXTRA_ID, id)
+            }
+    }
 
 }

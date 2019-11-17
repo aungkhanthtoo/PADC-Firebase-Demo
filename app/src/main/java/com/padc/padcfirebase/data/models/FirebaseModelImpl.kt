@@ -1,5 +1,6 @@
 package com.padc.padcfirebase.data.models
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,12 +9,14 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.storage.FirebaseStorage
 import com.padc.padcfirebase.data.vos.ArticleVO
 import com.padc.padcfirebase.data.vos.CommentVO
 import com.padc.padcfirebase.data.vos.UserVO
 import com.padc.padcfirebase.utils.REF_KEY_CLAP_COUNT
 import com.padc.padcfirebase.utils.REF_KEY_COMMENTS
 import com.padc.padcfirebase.utils.REF_PATH_ARTICLES
+import com.padc.padcfirebase.utils.STORAGE_FOLDER_PATH
 import kotlin.collections.ArrayList
 
 object FirebaseModelImpl: FirebaseModel {
@@ -125,25 +128,39 @@ object FirebaseModelImpl: FirebaseModel {
             }
     }
 
-    override fun addComment(comment: String, article: ArticleVO) {
+    override fun addComment(comment: String, pickedImage: Uri?, article: ArticleVO) {
+
+        if (pickedImage != null) {
+            uploadImageAndAddComment(comment, pickedImage, article)
+
+        } else {
+            val currentUser = UserAuthenticationModelImpl.currentUser!!
+            val newComment = CommentVO(
+                System.currentTimeMillis().toString(), "", comment, UserVO(
+                    currentUser.providerId,
+                    currentUser.displayName ?: "",
+                    currentUser.photoUrl.toString())
+            )
+            addComment(newComment, article)
+        }
+    }
+
+    private fun uploadImageAndAddComment(comment: String, pickedImage: Uri, article: ArticleVO) {
+        
+    }
+
+    private fun addComment(comment: CommentVO, article: ArticleVO){
         val commentsRef = databaseRef.child(REF_PATH_ARTICLES).child(article.id).child(REF_KEY_COMMENTS)
 
-        val currentUser = UserAuthenticationModelImpl.currentUser!!
+        val key = comment.id
 
-        val key = System.currentTimeMillis().toString()
-        val value = CommentVO(
-            key, "", comment, UserVO(
-                currentUser.providerId,
-                currentUser.displayName ?: "",
-                currentUser.photoUrl.toString())
-        )
-
-        commentsRef.child(key).setValue(value)
+        commentsRef.child(key).setValue(comment)
             .addOnSuccessListener {
                 Log.d(TAG, "Add Comment")
             }
             .addOnFailureListener {
                 Log.e(TAG, "Add Comment error ${it.localizedMessage}")
             }
+
     }
 }
