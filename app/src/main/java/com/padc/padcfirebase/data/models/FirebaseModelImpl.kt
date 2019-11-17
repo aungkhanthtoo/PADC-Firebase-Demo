@@ -146,7 +146,38 @@ object FirebaseModelImpl: FirebaseModel {
     }
 
     private fun uploadImageAndAddComment(comment: String, pickedImage: Uri, article: ArticleVO) {
-        
+        val storageRef = FirebaseStorage.getInstance().reference
+        val imagesFolderRef = storageRef.child(STORAGE_FOLDER_PATH)
+
+
+        val imageRef = imagesFolderRef.child(
+            pickedImage.lastPathSegment ?: System.currentTimeMillis().toString()
+        )
+
+            val uploadTask = imageRef.putFile(pickedImage)
+
+            uploadTask.addOnFailureListener{
+                Log.e(TAG, it.localizedMessage)
+            }
+            .addOnSuccessListener {
+                // get comment image's url
+
+                imageRef.downloadUrl.addOnCompleteListener {
+                    Log.d(TAG, "Image Uploaded ${it.result.toString()}")
+
+                    val currentUser = UserAuthenticationModelImpl.currentUser!!
+                    val newComment = CommentVO(
+                        System.currentTimeMillis().toString(), it.result.toString(), comment,
+                        UserVO(
+                            currentUser.providerId,
+                            currentUser.displayName ?: "",
+                            currentUser.photoUrl.toString())
+                    )
+
+                    addComment(newComment, article)
+                }
+
+            }
     }
 
     private fun addComment(comment: CommentVO, article: ArticleVO){
