@@ -35,6 +35,9 @@ class MainActivity : AppCompatActivity(), ArticlesView {
         setupRecyclerView()
         setupListeners()
         presenter.onUIReady(this)
+
+
+
     }
 
     private fun checkIntentForDetailActivity() {
