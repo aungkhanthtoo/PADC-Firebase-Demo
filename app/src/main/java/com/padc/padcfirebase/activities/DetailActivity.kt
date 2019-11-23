@@ -144,7 +144,6 @@ class DetailActivity : AppCompatActivity(), ArticleDetailView {
             )
 
         }
-
     }
 
     private fun setupRecyclerView() {

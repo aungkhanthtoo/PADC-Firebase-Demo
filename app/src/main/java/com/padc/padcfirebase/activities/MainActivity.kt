@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View.NO_ID
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
@@ -27,12 +28,20 @@ class MainActivity : AppCompatActivity(), ArticlesView {
     override fun onCreate(savedInstanceState: Bundle?) {
         //FirebaseDatabase.getInstance().setPersistenceEnabled(true)
         super.onCreate(savedInstanceState)
+        checkIntentForDetailActivity()
         setContentView(R.layout.activity_main)
         setupPresenter()
         setSupportActionBar(toolbar)
         setupRecyclerView()
         setupListeners()
         presenter.onUIReady(this)
+    }
+
+    private fun checkIntentForDetailActivity() {
+        val detailId = intent.getStringExtra(EXTRA_ARTICLE_ID)
+        if ( detailId != null) {
+            navigateToDetail(detailId)
+        }
     }
 
     override fun onStart() {
@@ -92,5 +101,9 @@ class MainActivity : AppCompatActivity(), ArticlesView {
         ivCurrentUser.setOnClickListener {
             presenter.onUserProfileClicked(this)
         }
+    }
+
+    companion object {
+        const val EXTRA_ARTICLE_ID = "id"
     }
 }

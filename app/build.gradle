@@ -46,6 +46,9 @@ dependencies {
     // Storage
     implementation 'com.google.firebase:firebase-storage:19.1.0'
 
+    // Cloud Messaging
+    implementation 'com.google.firebase:firebase-messaging:20.0.1'
+
     //Live Data and View Model
     implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
 
