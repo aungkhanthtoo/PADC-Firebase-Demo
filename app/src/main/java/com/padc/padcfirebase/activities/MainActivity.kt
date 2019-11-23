@@ -1,5 +1,6 @@
 package com.padc.padcfirebase.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +10,9 @@ import android.view.MenuItem
 import android.view.View.NO_ID
 import androidx.lifecycle.ViewModelProviders
 import com.bumptech.glide.Glide
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
+import com.google.android.gms.common.api.GoogleApiActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.FirebaseDatabase
@@ -34,11 +38,15 @@ class MainActivity : AppCompatActivity(), ArticlesView {
         setSupportActionBar(toolbar)
         setupRecyclerView()
         setupListeners()
+        checkGooglePlayService()
         presenter.onUIReady(this)
-
-
-
     }
+
+    override fun onResume() {
+        super.onResume()
+        checkGooglePlayService()
+    }
+
 
     private fun checkIntentForDetailActivity() {
         val detailId = intent.getStringExtra(EXTRA_ARTICLE_ID)
@@ -106,7 +114,15 @@ class MainActivity : AppCompatActivity(), ArticlesView {
         }
     }
 
+    private fun checkGooglePlayService(){
+        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS) {
+            GoogleApiAvailability().makeGooglePlayServicesAvailable(this)
+        }
+    }
+
     companion object {
         const val EXTRA_ARTICLE_ID = "id"
+
+        fun getNewIntent(context: Context) = Intent(context, MainActivity::class.java)
     }
 }
