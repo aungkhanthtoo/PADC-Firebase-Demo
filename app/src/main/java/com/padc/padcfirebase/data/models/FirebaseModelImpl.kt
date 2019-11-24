@@ -9,6 +9,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.padc.padcfirebase.data.vos.ArticleVO
 import com.padc.padcfirebase.data.vos.CommentVO
@@ -24,6 +25,7 @@ object FirebaseModelImpl: FirebaseModel {
     const val TAG = "FirebaseModel"
 
     private val databaseRef = FirebaseDatabase.getInstance().reference
+    private val firestore = FirebaseFirestore.getInstance()
 
     override fun getAllArticles(cleared: LiveData<Unit>): LiveData<List<ArticleVO>> {
         val liveData = MutableLiveData<List<ArticleVO>>()
@@ -48,6 +50,26 @@ object FirebaseModelImpl: FirebaseModel {
                 }
 
                 Log.d(TAG, "Value is: $articles")
+
+                for (article in articles){
+                    val id = article.id
+
+                    // add to firestore
+                    firestore.collection("articles")
+                        .document(id)
+                        .set(article)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "DocumentSnapshot added with ID: ${it}")
+                        }
+                        .addOnFailureListener {
+                            Log.w(TAG, "Error adding document", it)
+                        }
+
+
+
+                }
+
+
 
                 liveData.value = articles
             }
